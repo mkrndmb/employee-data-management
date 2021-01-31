@@ -1,0 +1,192 @@
+<!-- <!DOCTYPE html> -->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <link rel="stylesheet" href="./style.css"> -->
+    <title>Node Register</title>
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td,
+        th {
+            border: 1px solid #aa9f9f;
+            text-align: left;
+            padding: 8px;
+            width:20%;
+        }
+
+        tr:nth-child(even) {
+            background-color: #db1313;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <h1>
+            Admin Page
+        </h1>
+        <form action="" method="POST" class="form">
+            Name : <input type="text" name="name" id='name'>
+            Email : <input type="email" name="email" id='email'>
+            dept : <input type="text" name="dept" id='dept'>
+            joiningYear : <input type="number" name="joiningYear" id='joiningYear'>
+            <input type="submit" value="Add  +" class="submit">
+            <!-- <a href="http://localhost:5000/login.html" class="log">LOGIN</a> -->
+        </form>
+    </div>
+    <hr />
+    </div>
+    <table>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Dept</th>
+          <th>YearOfJoining &nbsp;<button type="button" onclick=onSort() class="sort"> Sort</button></th>
+          <th>Action</th>
+        </tr>
+        </table>
+    <div class="showcase"></div>
+    </div>
+    <script>
+        var c=0;
+        function onSort(){
+            c=1;
+            count=0;
+            console.log('hello from sort',c);
+            display()
+        }
+
+        console.log('hii');
+        
+        console.log('c is equal to:' ,c );
+        const form = document.querySelector('.form')
+        form.addEventListener('submit', registerUser)
+
+        async function registerUser(e) {
+            e.preventDefault()
+            const name = document.getElementById('name').value
+            const email = document.getElementById('email').value
+            const dept = document.getElementById('dept').value
+            const joiningYear = document.getElementById('joiningYear').value
+
+
+            const result = await fetch('/api/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name, email, dept, joiningYear
+                })
+
+            })
+
+           await location.reload()
+
+        }
+        let count=0,newData=[]
+        let data = []
+
+
+        async function display() {
+            
+            const r = await fetch('/data')
+            const d = await r.json()
+            data = [...d]
+            console.log(data);
+            let temp
+            let n=[...data]
+            let min=n[0]
+            console.log('prev min:',min);
+            for (let i=0;i<n.length;i++){
+                for (let j=i+1;j<n.length;j++){
+                    if(n[i].joiningYear > n[j].joiningYear){
+                        temp=n[i]
+                        n[i]=n[j]
+                        n[j]=temp
+                console.log('loop min:',min);
+            }
+                
+                }
+                
+            }   
+            console.log(n);
+            
+            
+            (c==1 ? newData=[...n] : newData=[...data])
+            const html = newData.map(d => {
+                const { _id, name, email, dept, joiningYear } = d
+                return `
+     <table>
+     
+                  <tr class='table-row' id="${_id}">
+                    <th scope="row">${++count}</th>
+                    <td>${name}</td>
+                    <td>${email}</td>
+                    <td>${dept}</td>
+                    <td>${joiningYear}</td>
+                    <td><button
+                        type='button' onclick=onUpdate("${_id}")>
+                        Update
+                      </button>
+                      <button
+                        type='button' onclick=onDelete("${_id}")>
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+              
+            </table>
+     `
+            }).join('')
+            showcase.innerHTML = html
+        }
+        async function onUpdate(id){
+            console.log("hello upadte", id);
+            await fetch(`/data/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+
+            })
+            await location.reload()
+        }
+        async function onDelete(id) {
+            console.log("hello delete", id);
+            // const tableRow = document.querySelector('.table-row')
+            // console.log("ha :",tableRow);
+            // if(tableRow.id===id)
+            // tableRow.remove()
+
+
+
+            const result = await fetch(`/data/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+
+            })
+            // const res=await result.json()
+            await location.reload()
+            // window.reload()
+        }
+        display()
+
+        const showcase = document.querySelector('.showcase')
+
+
+
+    </script>
+</body>
+
+</html>
